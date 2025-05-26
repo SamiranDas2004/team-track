@@ -45,7 +45,18 @@ app.post('/upload-snapshot', upload.single('snapshot'), (req, res) => {
 });
 
 // Endpoint 2: Upload application usage data from employee app
-app.post('/upload-app-usage', (req, res) => {
+
+
+const AppUsage = require('./models/AppUsage'); // adjust path as necessary
+
+
+
+
+
+
+
+
+app.post('/upload-app-usage', async (req, res) => {
   try {
     console.log('Request body:', req.body);
 
@@ -53,19 +64,133 @@ app.post('/upload-app-usage', (req, res) => {
       return res.status(400).json({ error: 'Request body is missing or not in JSON format' });
     }
 
-    const { appName, windowTitle, teamId, employeeId, timestamp } = req.body;
+    const appName = String(req.body.appName || '');
+    const windowTitle = String(req.body.windowTitle || '');
+    const teamId = String(req.body.teamId || '');
+    const employeeId = String(req.body.employeeId || '');
+    const timestamp = new Date(req.body.timestamp || Date.now());
+
     if (!appName || !teamId || !employeeId || !timestamp) {
       return res.status(400).json({ error: 'appName, teamId, employeeId, and timestamp are required' });
     }
 
-    console.log(`App usage for ${employeeId} in team ${teamId}: ${appName} - ${windowTitle} at ${new Date(timestamp)}`);
+    const appUsage = new AppUsage({
+      appName,
+      windowTitle,
+      teamId,
+      employeeId,
+      timestamp,
+    });
 
+    await appUsage.save();
+
+    console.log(`Saved app usage for employee ${employeeId}`);
     res.json({ status: 'success' });
+
   } catch (err) {
     console.error('Error uploading app usage:', err);
     res.status(500).json({ error: 'Failed to upload app usage' });
   }
 });
+
+
+app.get('/app-usage', async (req, res) => {
+  try {
+    const usageData = await AppUsage.find().sort({ timestamp: -1 }); // descending order by time
+
+    res.json({
+      status: 'success',
+      data: usageData
+    });
+  } catch (err) {
+    console.error('Error fetching app usage data:', err);
+    res.status(500).json({ error: 'Failed to fetch app usage data' });
+  }
+});
+
+app.post('/upload-app-usage', async (req, res) => {
+  try {
+    console.log('Request body:', req.body);
+
+    if (!req.body) {
+      return res.status(400).json({ error: 'Request body is missing or not in JSON format' });
+    }
+
+    
+
+    const appName = String(req.body.appName || '');
+    const windowTitle = String(req.body.windowTitle || '');
+    const teamId = String(req.body.teamId || '');
+    const employeeId = String(req.body.employeeId || '');
+    const timestamp = new Date(req.body.timestamp || Date.now());
+
+    if (!appName || !teamId || !employeeId || !timestamp) {
+      return res.status(400).json({ error: 'appName, teamId, employeeId, and timestamp are required' });
+    }
+
+    const appUsage = new AppUsage({
+      appName,
+      windowTitle,
+      teamId,
+      employeeId,
+      timestamp,
+    });
+
+    await appUsage.save();
+
+    console.log(`Saved app usage for employee ${employeeId}`);
+    res.json({ status: 'success' });
+
+  } catch (err) {
+    console.error('Error uploading app usage:', err);
+    res.status(500).json({ error: 'Failed to upload app usage' });
+  }
+});
+
+app.post('/upload-app-usage', async (req, res) => {
+  try {
+    console.log('Request body:', req.body);
+
+    if (!req.body) {
+      return res.status(400).json({ error: 'Request body is missing or not in JSON format' });
+    }
+
+    const appName = String(req.body.appName || '');
+    const windowTitle = String(req.body.windowTitle || '');
+    const teamId = String(req.body.teamId || '');
+    const employeeId = String(req.body.employeeId || '');
+    const timestamp = new Date(req.body.timestamp || Date.now());
+
+    if (!appName || !teamId || !employeeId || !timestamp) {
+      return res.status(400).json({ error: 'appName, teamId, employeeId, and timestamp are required' });
+    }
+
+    const appUsage = new AppUsage({
+      appName,
+      windowTitle,
+      teamId,
+      employeeId,
+      timestamp,
+    });
+
+    await appUsage.save();
+
+    console.log(`Saved app usage for employee ${employeeId}`);
+    res.json({ status: 'success' });
+
+  } catch (err) {
+    console.error('Error uploading app usage:', err);
+    res.status(500).json({ error: 'Failed to upload app usage' });
+  }
+});
+
+
+
+  
+  
+  
+
+
 
 // Endpoint 3: Get snapshots for a team (for manager app)
 // app.get('/snapshots', (req, res) => {

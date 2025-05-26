@@ -494,7 +494,7 @@ const trackApplications = async () => {
 
 setInterval(()=>{
   trackApplications()
-},12000)
+},30000)
 
 
 
